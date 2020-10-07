@@ -1,4 +1,4 @@
-Prototype code for replicating core results from arXiv preprint. Does not include StyleGAN experiments or setup instructions for the CAT and FFHQ datasets.
+Prototype code for replicating core results from arXiv preprint https://arxiv.org/abs/2010.02035. Does not include StyleGAN experiments or setup instructions for the CAT and FFHQ datasets.
 
 Main code contained in src/gan.py . Helper file src/run.py for feeding configuration for a run.
 
