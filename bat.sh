@@ -2,7 +2,7 @@
 ##See example configs below or src/run.py for options. Default args only for debugging.
 ##Examples assume 4 GPUs exposed to TensorFlow
 
-##Example 3-layer fully connected MNIST runs (metrics disabled: re-enabling requires Inception and MNIST classifier networks)
+##Example 3-layer fully connected MNIST runs (metrics disabled: re-enabling requires Inception and MNIST classifier networks, see lines 18-23)
 ##Outputs saved in out/<output_folder>_<run#>
 #python src/run.py --gpus='0' --output_folder=mnist_fc3_mm --g_cost_parameter=0.00 --g_renorm=none --g_cost=mm --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
 #python src/run.py --gpus='1' --output_folder=mnist_fc3_ns --g_cost_parameter=0.00 --g_renorm=none --g_cost=ns --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
@@ -10,7 +10,7 @@
 #python src/run.py --gpus='3' --output_folder=mnist_fc3_mmnsat --g_cost_parameter=1.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
 
 ##For explicitly gradient rescaled version of mmnsat:
-#python src/run.py --gpus='3' --output_folder=mnist_fc3_mmnsat --g_cost_parameter=0.00 --g_renorm=frac --g_cost=mm --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 --metrics=0 &
+#python src/run.py --gpus='3' --output_folder=mnist_fc3_mmnsat --g_cost_parameter=0.00 --g_renorm=frac --g_cost=mm --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
 
 ##CIFAR-10 dataset expected at data/cifar-10/data_batch_1 etc
 ##Available at https://www.cs.toronto.edu/~kriz/cifar.html
@@ -36,8 +36,8 @@
 ##CAT expects pre-processed .jpg files, FFHQ expects multi-resolution tfrecords files, see src/data.py
 
 ##Example conv-9 FFHQ512 MM-nsat
-#python src/run.py --gpus='0' --output_folder=ffhq512_conv_e1000_mmnsat --g_cost_parameter=1.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=convn --d_net=convn --dataset=ffhq512 --batch_size=64 --epochs=1000 --eval_n=20 --fid_n=50048 --m_dim=32 --runs_n=3 &
-#python src/run.py --gpus='1' --output_folder=ffhq512_conv_e1000_ns --g_cost_parameter=0.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=convn --d_net=convn --dataset=ffhq512 --batch_size=64 --epochs=1000 --eval_n=20 --fid_n=50048 --m_dim=32 --runs_n=3 &
+#python src/run.py --gpus='0' --output_folder=ffhq512_conv_e1000_mmnsat --g_cost_parameter=1.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=convn --d_net=convn --dataset=ffhq512 --batch_size=64 --epochs=1000 --eval_n=20 --fid_n=50000 --m_dim=32 --runs_n=3 --data_nchw=1 --net_nchw=1 &
+#python src/run.py --gpus='1' --output_folder=ffhq512_conv_e1000_ns --g_cost_parameter=0.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=convn --d_net=convn --dataset=ffhq512 --batch_size=64 --epochs=1000 --eval_n=20 --fid_n=50000 --m_dim=32 --runs_n=3 --data_nchw=1 --net_nchw=1 &
 
 ###Example DCG-bnsn CAT128 - fid_n=5000 due to dataset size
 #python src/run.py --gpus='0' --output_folder=cat128_dcgbnsn_e1000_ns --g_cost_parameter=0.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=dcg --d_net=dcg --d_sn=1 --d_sa=0 --g_sa=0 --d_bn=1 --g_bn=1 --dataset=cats128 --batch_size=64 --epochs=1000 --fid_n=5000 &

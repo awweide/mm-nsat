@@ -141,6 +141,33 @@ def get_networks(a, IMAGE_SHAPE):
             x = tf.nn.tanh(deconv(x, IMAGE_C , kernel=1, stride=1, sn=False, scope='channel_conv'))
             return x
 
+    #Replication CNN-networks Miyato 2018: Spectral normalization for GANs
+    #As given in Appendix B.4 : Table 3
+    def RepDisc(x):
+        with tf.variable_scope('Disc', reuse=tf.AUTO_REUSE):
+            x = tf.nn.leaky_relu(conv(x,64,kernel=3,stride=1,sn=True,scope='fconv1'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,64,kernel=4,stride=2,sn=True,scope='dconv1'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,128,kernel=3,stride=1,sn=True,scope='fconv2'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,128,kernel=4,stride=2,sn=True,scope='dconv2'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,256,kernel=3,stride=1,sn=True,scope='fconv3'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,256,kernel=4,stride=2,sn=True,scope='dconv3'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,512,kernel=3,stride=1,sn=True,scope='fconv4'), 0.1)
+            x = tf.reshape(x, [-1, 4*4*512])
+            x = fully_connected(x, 1, sn=True, scope='fc_final')
+            return x
+    def RepGen(z):
+         with tf.variable_scope('Gen', reuse=tf.AUTO_REUSE):
+            x = fully_connected(z, 4*4*512, sn=False, scope='fc_initial')
+            x = tf.reshape(x, [-1,4,4,512])
+            x = deconv(x,256,kernel=4,stride=2,sn=False,scope='uconv1')
+            x = tf.nn.relu(tf.layers.batch_normalization(x))
+            x = deconv(x,128,kernel=4,stride=2,sn=False,scope='uconv2')
+            x = tf.nn.relu(tf.layers.batch_normalization(x))
+            x = deconv(x,64,kernel=4,stride=2,sn=False,scope='uconv3')
+            x = tf.nn.relu(tf.layers.batch_normalization(x))
+            x = tf.nn.tanh(conv(x,IMAGE_C,kernel=3,stride=1,sn=False,scope='fconv_final'))
+            return x
+
     #Residual DCGAN: experimental
     def ResDCGDisc(x):
         with tf.variable_scope('Disc', reuse=tf.AUTO_REUSE):
@@ -297,8 +324,8 @@ def get_networks(a, IMAGE_SHAPE):
             return tf.reshape(x, [-1,] + IMAGE_SHAPE)
 
 
-    dnet_dict = {'dense':DenseDisc,'sndense':DenseSNDisc,'conv32':Conv32Disc,'conv32sn':Conv32SNDisc,'convn':ConvNDisc,'dcg':DCGDisc}
-    gnet_dict = {'dense':DenseGen,'sndense':DenseSNGen,'conv32':Conv32Gen,'conv32sn':Conv32SNGen,'convn':ConvNGen,'dcg':DCGGen}
+    dnet_dict = {'dense':DenseDisc,'sndense':DenseSNDisc,'conv32':Conv32Disc,'conv32sn':Conv32SNDisc,'convn':ConvNDisc,'dcg':DCGDisc,'rep':RepDisc}
+    gnet_dict = {'dense':DenseGen,'sndense':DenseSNGen,'conv32':Conv32Gen,'conv32sn':Conv32SNGen,'convn':ConvNGen,'dcg':DCGGen,'rep':RepGen}
     D,G = dnet_dict[a.d_net], gnet_dict[a.g_net]
     return D,G
 
