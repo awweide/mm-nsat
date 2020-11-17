@@ -2,7 +2,7 @@
 ##See example configs below or src/run.py for options. Default args only for debugging.
 ##Examples assume 4 GPUs exposed to TensorFlow
 
-##Example 3-layer fully connected MNIST runs (metrics disabled: re-enabling requires Inception and MNIST classifier networks, see lines 18-23)
+##Example 3-layer fully connected MNIST runs (metrics disabled: re-enabling requires Inception and MNIST classifier networks: see line 16)
 ##Outputs saved in out/<output_folder>_<run#>
 #python src/run.py --gpus='0' --output_folder=mnist_fc3_mm --g_cost_parameter=0.00 --g_renorm=none --g_cost=mm --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
 #python src/run.py --gpus='1' --output_folder=mnist_fc3_ns --g_cost_parameter=0.00 --g_renorm=none --g_cost=ns --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
@@ -12,11 +12,14 @@
 ##For explicitly gradient rescaled version of mmnsat:
 #python src/run.py --gpus='3' --output_folder=mnist_fc3_mmnsat --g_cost_parameter=0.00 --g_renorm=frac --g_cost=mm --d_cost=ns --d_sn=0 --g_sn=0 --g_net=dense --d_net=dense --dataset=mnist --d_layers=3 --g_layers=3 --m_dim=512 --batch_size=128 --epochs=1000 --eval_n=5 --eval_skip=1 &
 
+##Uncomment following line to perform all the following setup steps in succession:
+#python src/download.py && python src/mnist.py && python src/cifar.py
+
 ##CIFAR-10 dataset expected at data/cifar-10/data_batch_1 etc
 ##Available at https://www.cs.toronto.edu/~kriz/cifar.html
-
 ##Trained inception network for FID expected at 'data/fid_inception_model/frozen_inception_v1_2015_12_05.tar.gz'
 ##Available at http://download.tensorflow.org/models/frozen_inception_v1_2015_12_05.tar.gz
+##Classifiers must be trained for the D_JS(CD) metric
 ##Train classifiers - saves to correct destination when run from root folder
 ##Training the CIFAR-10 classifier takes some time
 #python src/mnist.py
@@ -44,6 +47,11 @@
 #python src/run.py --gpus='1' --output_folder=cat128_dcgbnsn_e1000_ls --g_cost_parameter=0.00 --g_renorm=none --g_cost=sig_ls --d_cost=sig_ls --g_net=dcg --d_net=dcg --d_sn=1 --d_sa=0 --g_sa=0 --d_bn=1 --g_bn=1 --dataset=cats128 --batch_size=64 --epochs=1000 --fid_n=5000 &
 #python src/run.py --gpus='2' --output_folder=cat128_dcgbnsn_e1000_hinge --g_cost_parameter=0.00 --g_renorm=none --g_cost=hinge --d_cost=hinge --g_net=dcg --d_net=dcg --d_sn=1 --d_sa=0 --g_sa=0 --d_bn=1 --g_bn=1 --dataset=cats128 --batch_size=64 --epochs=1000 --fid_n=5000 &
 #python src/run.py --gpus='3' --output_folder=cat128_dcgbnsn_e1000_mmf --g_cost_parameter=1.00 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=dcg --d_net=dcg --d_sn=1 --d_sa=0 --g_sa=0 --d_bn=1 --g_bn=1 --dataset=cats128 --batch_size=64 --epochs=1000 --fid_n=5000 &
+
+###Example CIFAR-10 Miyato SN-GAN replication
+#python src/run.py --gpus='0,1' --output_folder=cifar_rep_e1000_ns --g_cost_parameter=0.00 --d_cost_parameter=0.0 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=rep --d_net=rep --d_sn=1 --g_bn=1 --dataset=cifar --batch_size=256 --g_lr=0.0002 --d_lr=0.0002 --fid_n=50000 --epochs=1000 --eval_n=20 --runs_n=10 --eval_skip=0 &
+#python src/run.py --gpus='2,3' --output_folder=cifar_rep_e1000_mmnsat --g_cost_parameter=1.00 --d_cost_parameter=0.0 --g_renorm=none --g_cost=ns_mmnsat --d_cost=ns --g_net=rep --d_net=rep --d_sn=1 --g_bn=1 --dataset=cifar --batch_size=256 --g_lr=0.0002 --d_lr=0.0002 --fid_n=50000 --epochs=1000 --eval_n=20 --runs_n=10 --eval_skip=0 &
+
 
 ##TOY PROBLEMS: python src/toy.py
 ##Parameter 1: 0: (1-a)NS + (0+a)MM, 1: (1-a)NS + (0+a)MM-nsat

@@ -145,27 +145,30 @@ def get_networks(a, IMAGE_SHAPE):
     #As given in Appendix B.4 : Table 3
     def RepDisc(x):
         with tf.variable_scope('Disc', reuse=tf.AUTO_REUSE):
-            x = tf.nn.leaky_relu(conv(x,64,kernel=3,stride=1,sn=True,scope='fconv1'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,64,kernel=4,stride=2,sn=True,scope='dconv1'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,128,kernel=3,stride=1,sn=True,scope='fconv2'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,128,kernel=4,stride=2,sn=True,scope='dconv2'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,256,kernel=3,stride=1,sn=True,scope='fconv3'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,256,kernel=4,stride=2,sn=True,scope='dconv3'), 0.1)
-            x = tf.nn.leaky_relu(conv(x,512,kernel=3,stride=1,sn=True,scope='fconv4'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,64,kernel=3,stride=1,sn=a.d_sn,scope='fconv1'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,64,kernel=4,stride=2,sn=a.d_sn,scope='dconv1'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,128,kernel=3,stride=1,sn=a.d_sn,scope='fconv2'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,128,kernel=4,stride=2,sn=a.d_sn,scope='dconv2'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,256,kernel=3,stride=1,sn=a.d_sn,scope='fconv3'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,256,kernel=4,stride=2,sn=a.d_sn,scope='dconv3'), 0.1)
+            x = tf.nn.leaky_relu(conv(x,512,kernel=3,stride=1,sn=a.d_sn,scope='fconv4'), 0.1)
             x = tf.reshape(x, [-1, 4*4*512])
-            x = fully_connected(x, 1, sn=True, scope='fc_final')
+            x = fully_connected(x, 1, sn=a.d_sn, scope='fc_final')
             return x
     def RepGen(z):
          with tf.variable_scope('Gen', reuse=tf.AUTO_REUSE):
-            x = fully_connected(z, 4*4*512, sn=False, scope='fc_initial')
+            x = fully_connected(z, 4*4*512, sn=a.g_sn, scope='fc_initial')
             x = tf.reshape(x, [-1,4,4,512])
-            x = deconv(x,256,kernel=4,stride=2,sn=False,scope='uconv1')
-            x = tf.nn.relu(tf.layers.batch_normalization(x))
-            x = deconv(x,128,kernel=4,stride=2,sn=False,scope='uconv2')
-            x = tf.nn.relu(tf.layers.batch_normalization(x))
-            x = deconv(x,64,kernel=4,stride=2,sn=False,scope='uconv3')
-            x = tf.nn.relu(tf.layers.batch_normalization(x))
-            x = tf.nn.tanh(conv(x,IMAGE_C,kernel=3,stride=1,sn=False,scope='fconv_final'))
+            x = deconv(x,256,kernel=4,stride=2,sn=a.g_sn,scope='uconv1')
+            if a.g_bn: x = tf.layers.batch_normalization(x)
+            x = tf.nn.relu(x)
+            x = deconv(x,128,kernel=4,stride=2,sn=a.g_sn,scope='uconv2')
+            if a.g_bn: x = tf.layers.batch_normalization(x)
+            x = tf.nn.relu(x)
+            x = deconv(x,64,kernel=4,stride=2,sn=a.g_sn,scope='uconv3')
+            if a.g_bn: x = tf.layers.batch_normalization(x)
+            x = tf.nn.relu(x)
+            x = tf.nn.tanh(conv(x,IMAGE_C,kernel=3,stride=1,sn=a.g_sn,scope='fconv_final'))
             return x
 
     #Residual DCGAN: experimental
