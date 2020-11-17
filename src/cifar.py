@@ -158,7 +158,7 @@ model.summary()
 datagen = tf.keras.preprocessing.image.ImageDataGenerator(rotation_range=10, width_shift_range=0.1, height_shift_range=0.1, zoom_range=0.2, horizontal_flip=True)
 
 model.fit_generator(datagen.flow(np_x_train, np_y_train, BATCH_SIZE), epochs=EPOCHS)
-model.save('data/data/keras_resnet_cifar10_classifier.h5', include_optimizer=False)
+model.save('data/keras_resnet_cifar10_classifier.h5', include_optimizer=False)
 
 #model = tf.keras.models.load_model('data/keras_resnet_cifar10_classifier.h5')
 print model.evaluate(np_x_test, np_y_test, batch_size=BATCH_SIZE)
