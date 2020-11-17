@@ -1,10 +1,10 @@
-gedimport numpy as np
+import numpy as np
 import tensorflow as tf
 import tensorflow
 import pickle
 from scipy import ndimage
 
-EPOCHS = 200
+EPOCHS = 1
 BATCH_SIZE = 128
 
 def resnet_layer(inputs,
